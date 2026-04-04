@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0f172a">
+<title>SALOME</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f172a;--bg2:#1e293b;--bg3:#273449;--card:#1e293b;--brd:#334155;
+  --acc:#38bdf8;--grn:#34d399;--yel:#fbbf24;--red:#f87171;
+  --tx:#f1f5f9;--tx2:#94a3b8;--tx3:#64748b;
+  --r:16px;--rs:10px;--f:'DM Sans',sans-serif;--m:'DM Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:100dvh;max-width:480px;margin:0 auto;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.pg{display:none;flex-direction:column;min-height:100dvh}.pg.on{display:flex}
+
+/* header */
+.hdr{padding:44px 20px 12px;background:var(--bg);position:sticky;top:0;z-index:10;border-bottom:1px solid var(--brd)}
+.hdr-r{display:flex;align-items:center;gap:10px}
+.logo{width:32px;height:32px;border-radius:9px;background:var(--acc);display:flex;align-items:center;justify-content:center;font-family:var(--m);font-weight:500;font-size:12px;color:#0f172a;flex-shrink:0}
+.htit{font-size:17px;font-weight:600;letter-spacing:-.3px}
+.hsub{font-size:11px;color:var(--tx2);margin-top:1px}
+.ibtn{width:32px;height:32px;border-radius:9px;background:var(--bg3);border:none;color:var(--tx2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;flex-shrink:0;margin-left:auto}
+.ibtn.back{margin-left:0;margin-right:4px}
+
+/* scroll & nav */
+.scrl{flex:1;overflow-y:scroll;padding:14px 16px 100px;-webkit-overflow-scrolling:touch}
+.scrl::-webkit-scrollbar{width:5px}
+.scrl::-webkit-scrollbar-track{background:var(--bg2)}
+.scrl::-webkit-scrollbar-thumb{background:var(--brd);border-radius:5px;min-height:40px}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--bg2);border-top:1px solid var(--brd);display:flex;padding:8px 0 calc(8px + env(safe-area-inset-bottom));z-index:20}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px;cursor:pointer;border:none;background:none;color:var(--tx3);font-family:var(--f);font-size:10px;transition:color .2s}
+.ni.on{color:var(--acc)}.ni-ic{font-size:18px;line-height:1}
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);padding:14px 16px;margin-bottom:10px}
+.card.grn{border-color:var(--grn);background:rgba(52,211,153,.06)}
+.card.blu{border-color:var(--acc);background:rgba(56,189,248,.06)}
+.card.gry{border-color:var(--tx3);background:rgba(100,116,139,.06)}
+.card.yel{border-color:var(--yel);background:rgba(251,191,36,.05)}
+
+/* atividade lista home */
+.al{background:var(--card);border:1px solid var(--brd);border-radius:12px;padding:12px 14px;margin-bottom:7px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:border-color .15s,background .15s}
+.al:active{border-color:var(--acc);background:rgba(56,189,248,.04)}
+.al.ativo{border-color:var(--grn);background:rgba(52,211,153,.05)}
+.al.parado{border-color:var(--yel);background:rgba(251,191,36,.04)}
+.al-cod{font-family:var(--m);font-size:10px;color:var(--acc);margin-bottom:1px}
+.al-desc{font-size:13px;font-weight:500}
+.al-meta{font-size:11px;color:var(--tx3);margin-top:2px}
+.sec{font-size:10px;font-weight:600;letter-spacing:1px;color:var(--tx3);text-transform:uppercase;margin:14px 0 8px}
+
+/* tela apontamento */
+.ap-banner{border-radius:12px;padding:11px 13px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.ap-banner.pri{background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2)}
+.ap-banner.fec{background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.25)}
+.ap-banner.abi{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25)}
+.ap-banner-ic{font-size:20px;flex-shrink:0}
+.ap-banner-tx{font-size:12px;color:var(--tx2);line-height:1.4}
+.ap-banner-tx strong{display:block;font-size:13px;color:var(--tx);font-weight:600;margin-bottom:1px}
+
+.ap-card{background:var(--bg3);border-radius:14px;padding:18px;margin-bottom:14px;text-align:center}
+.ap-cod{font-family:var(--m);font-size:11px;color:var(--acc);margin-bottom:3px}
+.ap-desc{font-size:18px;font-weight:600;margin-bottom:8px}
+.ap-meta{display:flex;justify-content:center;gap:16px;margin-bottom:12px}
+.ap-meta span{font-size:11px;color:var(--tx2)}
+.ap-lbl{font-size:10px;color:var(--tx3);margin-bottom:3px}
+.ap-hora{font-family:var(--m);font-size:26px;font-weight:500;color:var(--acc);letter-spacing:2px}
+.ap-hora.run{color:var(--grn)}
+.ap-hora.lds{color:var(--tx3)}
+
+/* botões da tela de apontamento */
+.ap-btns{display:grid;gap:10px;margin-bottom:16px}
+.ap-btns.um{grid-template-columns:1fr}
+.ap-btns.dois{grid-template-columns:1fr 1fr}
+.apb{border-radius:12px;padding:14px;font-family:var(--f);font-size:14px;font-weight:600;cursor:pointer;border:none;display:flex;align-items:center;justify-content:center;gap:7px;transition:opacity .15s,transform .1s;width:100%}
+.apb:active{transform:scale(.97);opacity:.8}
+.apb:disabled{opacity:.4;cursor:default;transform:none}
+.apb.ini{background:var(--grn);color:#0f172a}
+.apb.and{background:rgba(52,211,153,.15);color:var(--grn);border:1px solid rgba(52,211,153,.4)}
+.apb.sus{background:rgba(100,116,139,.2);color:var(--tx2);border:1px solid var(--brd)}
+.apb.ret{background:var(--grn);color:#0f172a}
+.apb.lod{background:var(--bg3);color:var(--tx3);border:1px solid var(--brd)}
+
+/* cronômetro */
+.crono{font-family:var(--m);font-size:32px;font-weight:500;letter-spacing:3px;text-align:center;margin-bottom:14px}
+.crono.run{color:var(--grn)}
+.crono.pau{color:var(--yel)}
+
+/* observações */
+.obs-wrap{display:flex;gap:7px;margin-bottom:10px}
+.obs-inp{flex:1;background:var(--bg3);border:1px solid var(--brd);border-radius:9px;padding:10px 12px;color:var(--tx);font-family:var(--f);font-size:14px;outline:none;resize:none;min-height:42px;max-height:110px;transition:border-color .2s}
+.obs-inp:focus{border-color:var(--acc)}
+.obs-inp::placeholder{color:var(--tx3)}
+.obs-send{width:42px;height:42px;border-radius:9px;background:var(--acc);border:none;color:#0f172a;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700}
+.obs-send:active{opacity:.7}
+.obs-row{padding:8px 0;border-bottom:1px solid var(--brd);display:flex;gap:9px}
+.obs-row:last-child{border-bottom:none}
+.obs-h{font-family:var(--m);font-size:10px;color:var(--tx3);flex-shrink:0;padding-top:1px}
+.obs-t{font-size:13px;color:var(--tx);line-height:1.5}
+
+/* sequência */
+.si{background:var(--card);border:1px solid var(--brd);border-radius:11px;padding:11px 13px;margin-bottom:7px;display:flex;align-items:center;gap:9px;touch-action:none}
+.si.conf{border-color:var(--yel);background:rgba(251,191,36,.04)}
+.si.inat{opacity:.65}
+.si.ativ{border-color:var(--grn)}
+.si.drag{opacity:.3;border-style:dashed}
+.si.over{border-color:var(--acc);background:rgba(56,189,248,.07)}
+.dh{font-size:16px;color:var(--tx3);cursor:grab;flex-shrink:0}
+.si-info{flex:1;min-width:0}
+.si-cod{font-family:var(--m);font-size:10px;color:var(--acc);margin-bottom:1px}
+.si-desc{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.si-h{font-family:var(--m);font-size:10px;color:var(--tx3);margin-top:2px}
+.icob{width:26px;height:26px;border-radius:6px;border:none;background:var(--bg3);color:var(--tx2);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* badge */
+.bdg{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:600}
+.bg{background:rgba(52,211,153,.15);color:var(--grn)}
+.by{background:rgba(251,191,36,.15);color:var(--yel)}
+.bb{background:rgba(56,189,248,.15);color:var(--acc)}
+.bgr{background:var(--bg3);color:var(--tx2)}
+
+/* form / modal */
+.fg{margin-bottom:11px}
+.fl{font-size:11px;font-weight:500;color:var(--tx2);margin-bottom:4px;display:block}
+.fi{width:100%;background:var(--bg3);border:1px solid var(--brd);border-radius:9px;padding:10px 12px;color:var(--tx);font-family:var(--f);font-size:14px;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.fi:focus{border-color:var(--acc)}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cav{display:none;background:rgba(251,191,36,.1);border:1px solid var(--yel);border-radius:9px;padding:9px 12px;font-size:12px;color:var(--yel);margin-bottom:10px}
+.mbg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.mbg.on{display:flex}
+.modal{background:var(--bg2);border-radius:20px 20px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));width:100%;max-width:480px;max-height:88dvh;overflow-y:auto;animation:sUp .22s ease}
+@keyframes sUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mt{font-size:15px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.mc{background:none;border:none;color:var(--tx3);font-size:22px;cursor:pointer;line-height:1;padding:0}
+.btn{width:100%;padding:12px;border-radius:var(--r);border:none;font-family:var(--f);font-size:14px;font-weight:600;cursor:pointer;transition:opacity .15s,transform .1s;display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:8px}
+.btn:active{transform:scale(.97);opacity:.85}
+.bok{background:var(--grn);color:#0f172a}
+.bsc{background:var(--bg3);color:var(--tx);border:1px solid var(--brd)}
+.bdl{background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.3)}
+
+/* util */
+.load{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;gap:14px}
+.spin{width:36px;height:36px;border:3px solid var(--bg3);border-top-color:var(--acc);border-radius:50%;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:32px 16px;color:var(--tx2)}
+.et{font-size:14px;font-weight:500;color:var(--tx);margin-bottom:4px}
+.es{font-size:12px;line-height:1.5}
+.toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--bg2);border:1px solid var(--brd);border-radius:12px;padding:10px 16px;font-size:13px;font-weight:500;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;max-width:calc(100% - 32px);z-index:100}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{border-color:var(--grn);color:var(--grn)}
+.toast.er{border-color:var(--red);color:var(--red)}
+.toast.wa{border-color:var(--yel);color:var(--yel)}
+@keyframes fU{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fU .22s ease forwards}
+
+/* ── Accordion de grupos ── */
+.grp-card{background:var(--card);border:1px solid var(--brd);border-radius:var(--r);margin-bottom:8px;overflow:hidden}
+.grp-card.grp-ativo{border-color:var(--grn)}
+.grp-hdr{display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer;user-select:none;-webkit-user-select:none}
+.grp-hdr:active{background:rgba(255,255,255,.05)}
+.grp-nome{font-size:14px;font-weight:600}
+.grp-count{font-size:11px;color:var(--tx3);margin-top:1px}
+.grp-seta{width:28px;height:28px;border-radius:7px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--tx3);flex-shrink:0}
+.grp-item{display:flex;align-items:center;gap:10px;padding:11px 14px 11px 20px;border-top:1px solid var(--brd);cursor:pointer}
+.grp-item:active{background:rgba(56,189,248,.06)}
+.grp-item.ativo{background:rgba(52,211,153,.05)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="pg-login" class="pg" style="background:var(--bg)">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;padding:28px 24px;max-width:360px;margin:0 auto">
+
+    <!-- Logo -->
+    <div style="width:64px;height:64px;border-radius:18px;background:var(--acc);display:flex;align-items:center;justify-content:center;font-family:var(--m);font-weight:500;font-size:24px;color:#0f172a;margin-bottom:16px">S</div>
+    <div style="font-size:24px;font-weight:600;margin-bottom:4px;letter-spacing:-.3px">SALOME</div>
+    <div style="font-size:13px;color:var(--tx2);margin-bottom:36px">Apontamento de atividades</div>
+
+    <!-- Form -->
+    <div style="width:100%">
+      <!-- Nome -->
+      <div style="margin-bottom:16px">
+        <div style="font-size:12px;font-weight:500;color:var(--tx2);margin-bottom:6px">Seu nome</div>
+        <input id="login-nome" type="text" autocomplete="name"
+          placeholder="Digite seu nome completo"
+          style="width:100%;background:var(--bg3);border:2px solid var(--brd);border-radius:12px;padding:15px 16px;color:var(--tx);font-family:var(--f);font-size:16px;outline:none;-webkit-appearance:none;box-sizing:border-box"
+          onfocus="this.style.borderColor='var(--acc)'" onblur="this.style.borderColor='var(--brd)'"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('login-pin').focus()}">
+      </div>
+
+      <!-- PIN -->
+      <div style="margin-bottom:24px">
+        <div style="font-size:12px;font-weight:500;color:var(--tx2);margin-bottom:6px">PIN de acesso</div>
+        <input id="login-pin" type="text" inputmode="text" maxlength="20" autocomplete="off"
+          placeholder="Digite seu PIN"
+          style="width:100%;background:var(--bg3);border:2px solid var(--brd);border-radius:12px;padding:15px 16px;color:var(--tx);font-family:var(--m);font-size:18px;letter-spacing:4px;outline:none;text-align:center;-webkit-appearance:none;box-sizing:border-box"
+          onfocus="this.style.borderColor='var(--acc)'" onblur="this.style.borderColor='var(--brd)'"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();fazerLogin()}">
+      </div>
+
+      <!-- Erro -->
+      <div id="login-erro" style="display:none;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.35);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--red);margin-bottom:16px;text-align:center"></div>
+
+      <!-- Botão -->
+      <button id="btn-login" onclick="fazerLogin()"
+        style="width:100%;padding:16px;border-radius:14px;border:none;background:var(--acc);color:#0f172a;font-family:var(--f);font-size:16px;font-weight:600;cursor:pointer;-webkit-appearance:none;box-sizing:border-box">
+        Entrar
+      </button>
+    </div>
+
+    <div style="margin-top:32px;font-size:11px;color:var(--tx3);text-align:center">
+      SALOME Apontamento v1.0
+    </div>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div id="pg-load" class="pg on">
+  <div class="load"><div class="spin"></div>
+    <div style="color:var(--tx2);font-size:13px" id="load-msg">Carregando SALOME...</div>
+  </div>
+</div>
+
+<!-- ERRO -->
+<div id="pg-err" class="pg">
+  <div class="load">
+    <div style="font-size:40px">🔒</div>
+    <div style="font-size:16px;font-weight:600;margin-top:8px">Acesso negado</div>
+    <div style="color:var(--tx2);font-size:13px;text-align:center;max-width:240px;line-height:1.5;margin-top:6px" id="err-msg"></div>
+    <button class="btn bsc" style="width:auto;padding:10px 20px;margin-top:10px" onclick="location.reload()">Tentar novamente</button>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="pg-home" class="pg">
+  <div class="hdr">
+    <div class="hdr-r">
+      <div class="logo">S</div>
+      <div><div class="htit">SALOME</div><div class="hsub" id="h-sub">Apontamento</div></div>
+      <button class="ibtn" onclick="atualizarHome()" title="Atualizar">↻</button>
+    </div>
+  </div>
+  <div class="scrl">
+    <div id="h-atual"></div>
+    <div class="card fu" style="padding:12px 14px">
+      <div style="font-size:11px;color:var(--tx2);margin-bottom:8px" id="h-data"></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+        <div style="text-align:center;background:var(--bg3);border-radius:8px;padding:9px">
+          <div style="font-size:19px;font-weight:600;color:var(--acc)" id="c-tot">0</div>
+          <div style="font-size:10px;color:var(--tx3);margin-top:1px">Total</div>
+        </div>
+        <div style="text-align:center;background:var(--bg3);border-radius:8px;padding:9px">
+          <div style="font-size:19px;font-weight:600;color:var(--grn)" id="c-pro">0</div>
+          <div style="font-size:10px;color:var(--tx3);margin-top:1px">Produtivo</div>
+        </div>
+        <div style="text-align:center;background:var(--bg3);border-radius:8px;padding:9px">
+          <div style="font-size:19px;font-weight:600;color:var(--tx3)" id="c-ina">0</div>
+          <div style="font-size:10px;color:var(--tx3);margin-top:1px">Inativo</div>
+        </div>
+      </div>
+    </div>
+    <div class="sec">Selecione a próxima atividade</div>
+    <input id="busca" placeholder="🔍  Buscar atividade..."
+      style="width:100%;background:var(--bg3);border:1px solid var(--brd);border-radius:9px;padding:9px 12px;color:var(--tx);font-family:var(--f);font-size:13px;outline:none;margin-bottom:10px"
+      oninput="filtrar(this.value)">
+    <div style="position:relative">
+      <div id="h-lista"></div>
+    </div>
+  </div>
+  <nav class="nav">
+    <button class="ni on" onclick="irHome()"><span class="ni-ic">⊞</span>Home</button>
+    <button class="ni" onclick="irSeq()"><span class="ni-ic">≡</span>Sequência</button>
+    <button class="ni" onclick="irPerf()"><span class="ni-ic">👤</span>Perfil</button>
+  </nav>
+</div>
+
+<!-- APONTAMENTO -->
+<div id="pg-ap" class="pg">
+  <div class="hdr">
+    <div class="hdr-r">
+      <button class="ibtn back" onclick="irHome()">←</button>
+      <div><div class="htit" id="ap-tit">Apontamento</div><div class="hsub" id="ap-sub"></div></div>
+    </div>
+  </div>
+  <div class="scrl">
+    <div id="ap-banner"></div>
+    <div class="ap-card">
+      <div class="ap-cod" id="ap-cod"></div>
+      <div class="ap-desc" id="ap-desc"></div>
+      <div class="ap-meta"><span id="ap-set"></span><span id="ap-are"></span></div>
+      <div class="ap-lbl" id="ap-lbl">Hora de início</div>
+      <div class="ap-hora" id="ap-hora">--:--</div>
+    </div>
+    <!-- botões dinâmicos -->
+    <div class="ap-btns um" id="ap-btns"></div>
+    <!-- cronômetro e observações (pós-início) -->
+    <div id="ap-pos" style="display:none">
+      <div class="crono run" id="ap-crono">00:00:00</div>
+      <div class="sec">Observações</div>
+      <div class="obs-wrap">
+        <textarea class="obs-inp" id="obs-txt" placeholder="Registre uma ocorrência..."
+          oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();envObs()}"></textarea>
+        <button class="obs-send" onclick="envObs()">↑</button>
+      </div>
+      <div id="obs-list"><div style="text-align:center;font-size:12px;color:var(--tx3);padding:10px 0">Nenhuma ocorrência</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SEQUÊNCIA -->
+<div id="pg-seq" class="pg">
+  <div class="hdr">
+    <div class="hdr-r">
+      <div class="logo">S</div>
+      <div><div class="htit">Sequência</div><div class="hsub" id="seq-dt"></div></div>
+      <div style="display:flex;gap:6px;margin-left:auto">
+        <button id="btn-dia" class="ibtn" onclick="toggleDia()" style="width:auto;padding:0 10px;font-size:11px;font-weight:600" title="Fechar/Abrir dia">...</button>
+        <button class="ibtn" onclick="amSeq()" style="margin-left:0">＋</button>
+      </div>
+    </div>
+  </div>
+  <div class="scrl">
+    <div style="display:flex;gap:12px;margin-bottom:10px;font-size:11px;color:var(--tx3)">
+      <span><span style="color:var(--grn)">●</span> Ativo</span>
+      <span><span style="color:var(--yel)">●</span> Conflito</span>
+      <span><span style="opacity:.5">●</span> Inativo</span>
+    </div>
+    <div id="seq-list"></div>
+    <div style="font-size:11px;color:var(--tx3);text-align:center;margin-top:6px">Segure para reordenar</div>
+  </div>
+  <nav class="nav">
+    <button class="ni" onclick="irHome()"><span class="ni-ic">⊞</span>Home</button>
+    <button class="ni on"><span class="ni-ic">≡</span>Sequência</button>
+    <button class="ni" onclick="irPerf()"><span class="ni-ic">👤</span>Perfil</button>
+  </nav>
+</div>
+
+<!-- PERFIL -->
+<div id="pg-perf" class="pg">
+  <div class="hdr"><div class="hdr-r"><div class="logo">S</div><div><div class="htit">Perfil</div></div></div></div>
+  <div class="scrl">
+    <div class="card fu" style="text-align:center;padding:22px">
+      <div style="width:62px;height:62px;border-radius:16px;background:linear-gradient(135deg,var(--acc),#6366f1);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:600;color:#0f172a;margin:0 auto 12px" id="pf-av">?</div>
+      <div style="font-size:16px;font-weight:600" id="pf-nm">—</div>
+      <div style="font-size:12px;color:var(--tx2);margin-top:2px" id="pf-em">—</div>
+      <div style="margin-top:8px" id="pf-bdg"></div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--brd)"><span style="color:var(--tx2);font-size:13px">Versão</span><span style="font-family:var(--m);font-size:12px">1.0.0</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="color:var(--tx2);font-size:13px">Sistema</span><span style="font-size:12px">SALOME APONTAMENTO</span></div>
+    </div>
+    <button class="btn bsc" onclick="atuTudo()">↻ Atualizar dados</button>
+    <button class="btn" style="background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.3)" onclick="fazerLogout()">Sair / Trocar usuário</button>
+  </div>
+  <nav class="nav">
+    <button class="ni" onclick="irHome()"><span class="ni-ic">⊞</span>Home</button>
+    <button class="ni" onclick="irSeq()"><span class="ni-ic">≡</span>Sequência</button>
+    <button class="ni on"><span class="ni-ic">👤</span>Perfil</button>
+  </nav>
+</div>
+
+<!-- MODAL EDITAR SEQ -->
+<div class="mbg" id="m-ed">
+  <div class="modal">
+    <div class="mt">Editar horário <button class="mc" onclick="fm('m-ed')">×</button></div>
+    <div id="m-ed-info" style="font-size:13px;color:var(--tx2);margin-bottom:12px"></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Hora início</label><input type="time" class="fi" id="e-ini"></div>
+      <div class="fg"><label class="fl">Hora fim</label><input type="time" class="fi" id="e-fim"></div>
+    </div>
+    <div class="cav" id="e-cav"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="btn bdl" style="margin:0;padding:11px" onclick="delSeq()">🗑 Excluir</button>
+      <button class="btn bok" style="margin:0;padding:11px" onclick="savSeq()">✓ Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL INCLUIR SEQ -->
+<div class="mbg" id="m-inc">
+  <div class="modal">
+    <div class="mt">Incluir atividade <button class="mc" onclick="fm('m-inc')">×</button></div>
+    <div class="fg"><label class="fl">Atividade</label><select class="fi" id="inc-at"></select></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Hora início *</label><input type="time" class="fi" id="inc-ini"></div>
+      <div class="fg"><label class="fl">Hora fim</label><input type="time" class="fi" id="inc-fim"></div>
+    </div>
+    <div class="cav" id="inc-cav"></div>
+    <button class="btn bok" onclick="okIncluir()">＋ Incluir</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- MODAL CONFIRMAÇÃO -->
+<div class="mbg" id="m-conf">
+  <div class="modal" style="padding-bottom:calc(24px + env(safe-area-inset-bottom))">
+    <div style="font-size:28px;text-align:center;margin-bottom:10px" id="conf-ico">❓</div>
+    <div style="font-size:15px;font-weight:600;text-align:center;margin-bottom:6px" id="conf-tit"></div>
+    <div style="font-size:13px;color:var(--tx2);text-align:center;line-height:1.5;margin-bottom:20px" id="conf-msg"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button class="btn bsc" style="margin:0" onclick="confResp(false)">Cancelar</button>
+      <button class="btn" style="margin:0" id="conf-ok" onclick="confResp(true)">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════
+// CONSTANTES E ESTADO
+// ═══════════════════════════════════
+const INAT = "INATIVO-001";
+// ── Token de sessão (apenas memória — sem localStorage no mobile)
+function getToken() { return S.token || ""; }
+function setToken(t,n) { S.token = t; S.nomeLocal = n; }
+function clearToken() { S.token = ""; S.nomeLocal = ""; }
+
+// ── Login ──
+function fazerLogin() {
+  const nome = (document.getElementById("login-nome").value || "").trim();
+  const pin  = (document.getElementById("login-pin").value  || "").trim();
+  const erroEl = document.getElementById("login-erro");
+  const btn    = document.getElementById("btn-login");
+
+  if (!nome || !pin) { erroEl.textContent = "Informe seu nome e PIN"; erroEl.style.display="block"; return; }
+  erroEl.style.display = "none";
+  btn.textContent = "Entrando..."; btn.disabled = true;
+
+  gsr("wsLogin", { nome, pin }).then(function(res) {
+      btn.textContent = "Entrar"; btn.disabled = false;
+      if (!res || res.__erro) {
+        erroEl.textContent = res ? res.__erro : "Erro ao conectar";
+        erroEl.style.display = "block";
+        return;
+      }
+      setToken(res.token, res.nome);
+      continueInit();
+    }).catch(function(e) {
+      btn.textContent = "Entrar"; btn.disabled = false;
+      erroEl.textContent = "Erro: " + (e.message || String(e));
+      erroEl.style.display = "block";
+    });
+}
+
+function fazerLogout() {
+  const t = getToken();
+  clearToken();
+  gsr("wsLogout", t).catch(()=>{});
+  go("login");
+  document.getElementById("login-nome").value = "";
+  document.getElementById("login-pin").value  = "";
+}
+
+// ── modal de confirmação ──
+let _confResolve = null;
+function confirmar(ico, titulo, msg, okTxt="Confirmar", okCls="bok") {
+  return new Promise(res => {
+    _confResolve = res;
+    document.getElementById("conf-ico").textContent = ico;
+    document.getElementById("conf-tit").textContent = titulo;
+    document.getElementById("conf-msg").textContent = msg;
+    const btn = document.getElementById("conf-ok");
+    btn.textContent = okTxt;
+    btn.className   = "btn " + okCls;
+    am("m-conf");
+  });
+}
+function confResp(ok) {
+  fm("m-conf");
+  if (_confResolve) { _confResolve(ok); _confResolve = null; }
+}
+
+const S = {
+  user:    null,
+  ativs:   [],     // todas as atividades
+  filt:    [],     // filtradas na busca
+  aponts:  [],     // do dia
+  atual:   null,   // apontamento aberto (sem hora_fim)
+  // tela de apontamento
+  ativAp:  null,   // atividade selecionada
+  apId:    null,   // id do registro em andamento
+  estado:  "pre",  // "pre" | "andamento" | "suspenso"
+  apIdInat:null,   // id do inativo aberto (para retomar)
+  obsLoc:  [],
+  token:   "",       // token de sessão
+  nomeLocal: "",
+  crono:   null,
+  seqIt:   [],
+  seqEd:   null,
+  dragIdx: null,
+  statusDia:    null,
+  gruposAbertos: {},   // nome do grupo → bool (expandido)
+  gruposIdx:     [],   // ordem dos grupos
+};
+
+// ═══════════════════════════════════
+// BRIDGE — chama API via fetch
+// ═══════════════════════════════════
+const API_URL = "https://script.google.com/macros/s/AKfycbw1DcHIKPHt5WPwMQP1-UuPea-trKwiYNf8xwIm50-7WyiXSJmVRyTxUStbHIJoLpUlfw/exec";
+
+function gsr(fn, arg) {
+  return new Promise(async (ok, err) => {
+    try {
+      const body = { fn, arg: arg !== undefined ? arg : null };
+      const res  = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify(body),
+      });
+      const json = await res.json();
+      if (json && json.__erro) err(new Error(json.__erro));
+      else ok(json);
+    } catch(e) {
+      err(new Error("Erro de conexão: " + (e.message||String(e))));
+    }
+  });
+}
+
+// ═══════════════════════════════════
+// INIT
+// ═══════════════════════════════════
+async function init() {
+  go("login");
+}
+
+async function continueInit() {
+  lMsg("Autenticando...");
+  go("load");
+  try {
+    S.user  = await gsr("wsGetPerfil", getToken());
+    lMsg("Carregando atividades...");
+    S.ativs = await gsr("wsGetAtividades", getToken());
+    S.filt  = [...S.ativs];
+    await carregarHome();
+    go("home");
+  } catch(e) {
+    // Token inválido — vai para login
+    clearToken();
+    go("login");
+  }
+}
+
+// ═══════════════════════════════════
+// HOME
+// ═══════════════════════════════════
+async function carregarHome() {
+  const hoje = new Date();
+  document.getElementById("h-data").textContent =
+    hoje.toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"long"});
+  document.getElementById("h-sub").textContent =
+    "Olá, " + (S.user.nome||S.user.email).split(" ")[0] + " 👋";
+  try {
+    S.aponts = await gsr("wsGetMeusApontamentos", {token:getToken(), data:""});
+    S.atual  = S.aponts.find(a => !a.hora_fim || a.hora_fim === "") || null;
+    rAtual(); rCont(); rLista();
+  } catch(_) {}
+}
+
+function atualizarHome() {
+  toast("Atualizando...","");
+  carregarHome().then(() => toast("Atualizado!","ok"));
+}
+
+function rAtual() {
+  const el = document.getElementById("h-atual");
+  if (!S.atual) {
+    el.innerHTML = `<div class="card gry" style="display:flex;align-items:center;gap:10px;padding:12px 14px;margin-bottom:10px">
+      <span style="font-size:18px">💤</span>
+      <div><div style="font-size:13px;font-weight:500;color:var(--tx2)">Nenhuma atividade em andamento</div>
+      <div style="font-size:11px;color:var(--tx3);margin-top:1px">Selecione uma atividade abaixo</div></div>
+    </div>`;
+    return;
+  }
+  const inat = S.atual.atividade_codigo === INAT;
+  el.innerHTML = `<div class="card ${inat?'yel':'grn'}" style="display:flex;align-items:center;gap:10px;padding:12px 14px;margin-bottom:10px;cursor:pointer" onclick="abrirAp('${S.atual.atividade_codigo}','${esc(S.atual.atividade_desc||S.atual.atividade_codigo)}','${esc(S.atual.setor||'')}','${esc(S.atual.area||'')}')">
+    <span style="font-size:18px">${inat?'⏸':'▶'}</span>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:10px;font-family:var(--m);color:${inat?'var(--yel)':'var(--acc)'};margin-bottom:1px">${S.atual.atividade_codigo}</div>
+      <div style="font-size:13px;font-weight:600">${S.atual.atividade_desc||S.atual.atividade_codigo}</div>
+      <div style="font-size:11px;color:var(--tx3);margin-top:1px">desde ${S.atual.hora_inicio||'--:--'}</div>
+    </div>
+    <span class="bdg ${inat?'by':'bg'}">${inat?'⏸ PARADO':'● ATIVO'}</span>
+  </div>`;
+}
+
+function rCont() {
+  const tot  = S.aponts.length;
+  const ina  = S.aponts.filter(a => a.atividade_codigo === INAT).length;
+  document.getElementById("c-tot").textContent = tot;
+  document.getElementById("c-pro").textContent = tot - ina;
+  document.getElementById("c-ina").textContent = ina;
+}
+
+function rLista() {
+  const el = document.getElementById("h-lista");
+  const lista = S.filt.filter(a => a.codigo !== INAT);
+  if (!lista.length) {
+    el.innerHTML = '<div class="empty"><div class="et">Nenhuma encontrada</div></div>';
+    return;
+  }
+
+  // Agrupa por grupo
+  const grupos = {};
+  const ordemGrupos = [];
+  lista.forEach(a => {
+    const g = (a.grupo && String(a.grupo).trim() && String(a.grupo).trim() !== "undefined")
+      ? String(a.grupo).trim()
+      : _grupoFallback(a.codigo);
+    if (!grupos[g]) { grupos[g] = []; ordemGrupos.push(g); }
+    grupos[g].push(a);
+  });
+
+  let html = "";
+  ordemGrupos.forEach((nome, gi) => {
+    const ativs   = grupos[nome];
+    const temAtivo = ativs.some(a => S.atual && a.codigo === S.atual.atividade_codigo && !S.atual.hora_fim);
+    const aberto   = !!(temAtivo || S.gruposAbertos[nome]);
+
+    // Seta: → fechado | ↑ aberto
+    const seta = aberto ? "↑" : "→";
+    const borderColor = temAtivo ? "var(--grn)" : "var(--brd)";
+
+    // Itens do grupo
+    const itensHtml = ativs.map(a => {
+      const isAtivo = S.atual && a.codigo === S.atual.atividade_codigo && !S.atual.hora_fim;
+      const cod  = a.codigo   || "";
+      const desc = a.descricao || "";
+      const set  = a.setor_padrao || "";
+      const are  = a.area_padrao  || "";
+      const metaHtml = (set||are)
+        ? '<div class="al-meta">' + [set,are].filter(Boolean).join(" · ") + "</div>"
+        : "";
+      const badgeHtml = isAtivo
+        ? '<span class="bdg bg">&#9679; ATIVO</span>'
+        : '<span style="color:var(--tx3);font-size:16px">&#8250;</span>';
+      return '<div class="grp-item' + (isAtivo?" ativo":"") + '"'
+        + ' data-cod="' + encodeURIComponent(cod) + '" data-desc="' + encodeURIComponent(desc) + '" data-set="' + encodeURIComponent(set) + '" data-are="' + encodeURIComponent(are) + '">' 
+        + '<div style="flex:1;min-width:0">'
+        + '<div class="al-cod">' + cod + "</div>"
+        + '<div class="al-desc">' + desc + "</div>"
+        + metaHtml
+        + "</div>"
+        + badgeHtml
+        + "</div>";
+    }).join("");
+
+    html += '<div style="background:var(--card);border:1px solid ' + borderColor + ';border-radius:var(--r);margin-bottom:8px;overflow:hidden">'
+      + '<div class="grp-hdr" data-gi="' + gi + '" data-nome="' + encodeURIComponent(nome) + '">'
+      + '<div style="flex:1;min-width:0">'
+      + '<div class="grp-nome">' + nome + "</div>"
+      + '<div class="grp-count">' + ativs.length + " atividade" + (ativs.length>1?"s":"") + "</div>"
+      + "</div>"
+      + '<div style="display:flex;align-items:center;gap:8px">'
+      + (temAtivo ? '<span class="bdg bg">&#9679; ATIVO</span>' : "")
+      + '<div class="grp-seta" id="grp-seta-' + gi + '">' + seta + "</div>"
+      + "</div>"
+      + "</div>"
+      + '<div id="grp-body-' + gi + '" style="display:' + (aberto?"block":"none") + '">'
+      + itensHtml
+      + "</div>"
+      + "</div>";
+  });
+
+  el.innerHTML = html;
+}
+
+
+function _grupoFallback(codigo) {
+  const mapa = {
+    "EMBARCADOR":"Embarcador","TRANSPORTE":"Transporte",
+    "DESCARGA":"Descarga e recebimento","ARMAZEM":"Armazém",
+    "PALET":"Palete","CARGA":"Carga e embarque",
+    "ADMIN":"Administrativo","SUPORTE":"Suporte","INATIVO":"Sistema",
+  };
+  const pref = String(codigo||"").split("-")[0].trim();
+  return mapa[pref] || pref || "Outros";
+}
+
+function toggleGrupo(idx, nome) {
+  S.gruposAbertos[nome] = !S.gruposAbertos[nome];
+  const aberto = S.gruposAbertos[nome];
+  const body = document.getElementById("grp-body-" + idx);
+  const seta = document.getElementById("grp-seta-" + idx);
+  if (body) body.style.display = aberto ? "block" : "none";
+  // → fechado | ↑ aberto
+  if (seta) seta.textContent = aberto ? "↑" : "→";
+}
+
+function filtrar(t) {
+  const s = t.toLowerCase();
+  if (!s) {
+    S.filt = [...S.ativs];
+  } else {
+    S.filt = S.ativs.filter(a => a.codigo !== INAT &&
+      (a.codigo.toLowerCase().includes(s) ||
+       a.descricao.toLowerCase().includes(s) ||
+       (a.grupo||"").toLowerCase().includes(s)));
+    // Abre grupos com resultado
+    S.filt.filter(a=>a.codigo!==INAT).forEach(a => {
+      if (a.grupo) S.gruposAbertos[a.grupo] = true;
+    });
+  }
+  rLista();
+}
+
+// ═══════════════════════════════════
+// TELA APONTAMENTO — abre e consulta
+// ═══════════════════════════════════
+async function abrirAp(codigo, descricao, setor, area) {
+  // Preenche card imediatamente
+  const ativ = S.ativs.find(x => x.codigo === codigo) ||
+               {codigo, descricao, setor_padrao:setor, area_padrao:area};
+  S.ativAp  = ativ;
+  S.obsLoc  = [];
+
+  document.getElementById("ap-tit").textContent  = descricao;
+  document.getElementById("ap-sub").textContent  = codigo;
+  document.getElementById("ap-cod").textContent  = codigo;
+  document.getElementById("ap-desc").textContent = descricao;
+  document.getElementById("ap-set").innerHTML    = setor ? `🏭 ${setor}` : '';
+  document.getElementById("ap-are").innerHTML    = area  ? `📍 ${area}`  : '';
+  document.getElementById("ap-hora").textContent = "--:--";
+  document.getElementById("ap-hora").className   = "ap-hora lds";
+  document.getElementById("ap-lbl").textContent  = "Consultando...";
+  document.getElementById("ap-banner").innerHTML = '';
+  document.getElementById("ap-pos").style.display = "none";
+  pararCrono();
+
+  // Botão loading enquanto consulta
+  setBtns([{cls:"apb lod",txt:"⏳ Consultando...",dis:true}],"um");
+  go("ap");
+
+  // Consulta servidor: qual é a situação real agora?
+  try {
+    const sit = await gsr("wsGetSituacaoAtual", getToken());
+
+    // ── Verifica pendências de dias anteriores ──
+    if (sit.pendente) {
+      const p    = sit.pendente;
+      const dBR  = p.data_inicio.split("-").reverse().join("/");
+      const ok   = await confirmar(
+        "⚠️",
+        "Dia anterior em aberto",
+        `Você tem um apontamento de ${dBR} que não foi encerrado:
+"${p.atividade_desc||p.atividade_codigo}"
+
+Vamos encerrar automaticamente às 23:59 daquele dia e iniciar o novo apontamento normalmente.`,
+        "Entendido, continuar",
+        "by"
+      );
+      if (!ok) { go("home"); return; }
+      // Fecha todas as pendências no servidor
+      toast("Encerrando pendências...","wa");
+      await gsr("wsFecharPendencias", getToken());
+      toast("Pendências encerradas ✓","ok");
+    }
+
+    const ab  = sit.aberto;
+    S.atual = ab;
+
+    if (ab && ab.atividade_codigo === codigo) {
+      // ── CASO 1: atividade escolhida JÁ ESTÁ ABERTA ──
+      S.apId    = ab.id_apontamento;
+      S.estado  = "andamento";
+
+      document.getElementById("ap-hora").textContent = ab.hora_inicio||"--:--";
+      document.getElementById("ap-hora").className   = "ap-hora run";
+      document.getElementById("ap-lbl").textContent  = "Em andamento desde";
+
+      rBanner("andamento", ab);
+      setBtns([
+        {id:"btn-and",cls:"apb and",txt:"● Em andamento",dis:true},
+        {id:"btn-sus",cls:"apb sus",txt:"⏸ Suspenso",    dis:false,fn:"clicarSuspenso()"},
+      ],"dois");
+
+      document.getElementById("ap-pos").style.display = "block";
+      iniciarCrono(ab.hora_inicio);
+      rObs();
+
+      // Carrega observações
+      gsr("wsGetObservacoes", ab.id_apontamento).then(obs => {
+        S.obsLoc = obs||[]; rObs();
+      }).catch(()=>{});
+
+    } else {
+      // ── CASO 2: atividade diferente (ou nenhuma aberta) ──
+      S.estado = "pre";
+      const agora = new Date().toTimeString().slice(0,5);
+      document.getElementById("ap-hora").textContent = agora;
+      document.getElementById("ap-hora").className   = "ap-hora";
+      document.getElementById("ap-lbl").textContent  = "Hora de início";
+
+      rBanner("pre", ab);
+      // Só 1 botão: Iniciar
+      setBtns([{id:"btn-ini",cls:"apb ini",txt:"▶ Iniciar",dis:false,fn:"clicarIniciar()"}],"um");
+    }
+  } catch(e) {
+    toast("Erro ao consultar: "+e.message,"er");
+    setBtns([{id:"btn-ini",cls:"apb ini",txt:"▶ Iniciar",dis:false,fn:"clicarIniciar()"}],"um");
+    document.getElementById("ap-lbl").textContent = "Hora de início";
+    document.getElementById("ap-hora").textContent = new Date().toTimeString().slice(0,5);
+    document.getElementById("ap-hora").className   = "ap-hora";
+    rBanner("pre", S.atual);
+  }
+}
+
+// ── renderiza banner de contexto ──
+function rBanner(modo, ab) {
+  const el = document.getElementById("ap-banner");
+  if (!ab) {
+    el.innerHTML = `<div class="ap-banner pri"><span class="ap-banner-ic">🌅</span>
+      <div class="ap-banner-tx"><strong>Primeiro apontamento do dia</strong>A atividade iniciará agora</div></div>`;
+    return;
+  }
+  if (modo === "andamento") {
+    el.innerHTML = `<div class="ap-banner abi"><span class="ap-banner-ic">▶</span>
+      <div class="ap-banner-tx"><strong>Esta atividade está em andamento</strong>Acompanhe o tempo abaixo</div></div>`;
+    return;
+  }
+  const inat = ab.atividade_codigo === INAT;
+  el.innerHTML = `<div class="ap-banner fec"><span class="ap-banner-ic">${inat?'⏸':'✅'}</span>
+    <div class="ap-banner-tx">
+      <strong>${inat?'Parada em andamento':'Atividade em andamento'}</strong>
+      ${ab.atividade_desc||ab.atividade_codigo} · desde ${ab.hora_inicio||'--:--'}
+    </div></div>`;
+}
+
+// ── monta os botões dinamicamente ──
+function setBtns(btns, layout) {
+  const el = document.getElementById("ap-btns");
+  el.className = "ap-btns " + layout;
+  el.innerHTML = btns.map(b =>
+    `<button id="${b.id||''}" class="${b.cls}" ${b.dis?'disabled':''} ${b.fn?'onclick="'+b.fn+'"':''}>${b.txt}</button>`
+  ).join("");
+}
+
+// ═══════════════════════════════════
+// INICIAR
+// ═══════════════════════════════════
+async function clicarIniciar() {
+  if (S.estado === "suspenso") { retomar(); return; }
+
+  // Verifica se há atividade diferente aberta
+  if (S.atual && (!S.atual.hora_fim || S.atual.hora_fim === "") &&
+      S.atual.atividade_codigo !== S.ativAp.codigo) {
+    const ant = S.atual.atividade_desc || S.atual.atividade_codigo;
+    const ok  = await confirmar("🔄",
+      "Trocar atividade?",
+      'Encerrar "' + ant + '" e iniciar "' + S.ativAp.descricao + '"?',
+      "Encerrar e iniciar", "bok"
+    );
+    if (!ok) return;
+  }
+
+  const horaAgora = new Date().toTimeString().slice(0,5);
+  document.getElementById("ap-hora").textContent = horaAgora;
+  document.getElementById("ap-hora").className   = "ap-hora run";
+  document.getElementById("ap-lbl").textContent  = "Em andamento desde";
+
+  // Desabilita botão e mostra loading
+  setBtns([{cls:"apb lod",txt:"⏳ Iniciando...",dis:true}],"um");
+
+  const payload = {
+    codigo:    S.ativAp.codigo,
+    descricao: S.ativAp.descricao,
+    setor:     S.ativAp.setor_padrao||"",
+    area:      S.ativAp.area_padrao||"",
+    hora:      horaAgora,
+    idFechar:  S.atual ? (S.atual.id_apontamento||"") : "",
+    token:     getToken(),
+  };
+
+  const tmo = setTimeout(() => {
+    setBtns([{id:"btn-ini",cls:"apb ini",txt:"▶ Iniciar",dis:false,fn:"clicarIniciar()"}],"um");
+    toast("Tempo esgotado — tente novamente","er");
+  }, 25000);
+
+  gsr("wsIniciarAtividade", payload).then(function(res) {
+      clearTimeout(tmo);
+      if (!res||res.__erro) {
+        setBtns([{id:"btn-ini",cls:"apb ini",txt:"▶ Iniciar",dis:false,fn:"clicarIniciar()"}],"um");
+        toast("Erro: "+(res?res.__erro:"sem resposta"),"er");
+        return;
+      }
+      // Sucesso!
+      S.apId   = res.id;
+      S.estado = "andamento";
+      S.obsLoc = [];
+
+      const novo = {
+        id_apontamento:   res.id,
+        atividade_codigo: S.ativAp.codigo,
+        atividade_desc:   S.ativAp.descricao,
+        hora_inicio:      horaAgora,
+        hora_fim:         "",
+        setor:            S.ativAp.setor_padrao||"",
+        area:             S.ativAp.area_padrao||"",
+      };
+      if (S.atual) S.atual.hora_fim = horaAgora;
+      S.aponts.push(novo);
+      S.atual = novo;
+
+      setBtns([
+        {id:"btn-and",cls:"apb and",txt:"● Em andamento",dis:true},
+        {id:"btn-sus",cls:"apb sus",txt:"⏸ Suspenso",    dis:false,fn:"clicarSuspenso()"},
+      ],"dois");
+      rBanner("andamento", novo);
+      document.getElementById("ap-pos").style.display = "block";
+      pararCrono();
+      iniciarCrono(horaAgora);
+      rObs();
+      toast("✓ "+S.ativAp.descricao+" iniciada","ok");
+    })
+  }).catch(function(e) {
+      clearTimeout(tmo);
+      setBtns([{id:"btn-ini",cls:"apb ini",txt:"▶ Iniciar",dis:false,fn:"clicarIniciar()"}],"um");
+      toast("Falha: "+(e.message||String(e)),"er");
+  });
+}
+
+// ═══════════════════════════════════
+// SUSPENSO / RETOMAR
+// ═══════════════════════════════════
+async function clicarSuspenso() {
+  const ok = await confirmar("⏸",
+    "Suspender atividade?",
+    '"' + S.ativAp.descricao + '" será pausada e registrada como Inativo.',
+    "Suspender", "bdl"
+  );
+  if (!ok) return;
+  suspender();
+}
+
+function suspender() {
+  const hora = new Date().toTimeString().slice(0,5);
+  setBtns([{cls:"apb lod",txt:"⏳ ...",dis:true}],"um");
+
+  gsr("wsIniciarAtividade", {
+      codigo:INAT,descricao:"Inativo",setor:"",area:"",
+      hora,idFechar:S.apId||"",token:getToken(),
+    }).then(function(res) {
+      if (!res||res.__erro) { toast("Erro ao suspender","er"); return; }
+      S.apIdInat = res.id;
+      S.estado   = "suspenso";
+      if (S.atual) S.atual.hora_fim = hora;
+      const novo = {id_apontamento:res.id,atividade_codigo:INAT,hora_inicio:hora,hora_fim:""};
+      S.aponts.push(novo);
+      S.atual = novo;
+      pararCrono();
+      document.getElementById("ap-hora").textContent = hora;
+      document.getElementById("ap-hora").className   = "ap-hora";
+      document.getElementById("ap-lbl").textContent  = "Suspenso desde";
+      document.getElementById("ap-crono").className  = "crono pau";
+      setBtns([
+        {id:"btn-ret",cls:"apb ret",txt:"▶ Retomar",dis:false,fn:"retomar()"},
+        {id:"btn-sus2",cls:"apb sus",txt:"⏸ Suspenso",dis:true},
+      ],"dois");
+      rBanner("andamento",{atividade_codigo:INAT,atividade_desc:"Inativo",hora_inicio:hora});
+      toast("⏸ Atividade suspensa","wa");
+    })
+  }).catch(function(e) {
+      toast("Falha: "+(e.message||String(e)),"er");
+      setBtns([
+        {id:"btn-and",cls:"apb and",txt:"● Em andamento",dis:true},
+        {id:"btn-sus",cls:"apb sus",txt:"⏸ Suspenso",dis:false,fn:"clicarSuspenso()"},
+      ],"dois");
+  });
+}
+
+function retomar() {
+  const hora = new Date().toTimeString().slice(0,5);
+  setBtns([{cls:"apb lod",txt:"⏳ Retomando...",dis:true}],"um");
+
+  gsr("wsIniciarAtividade", {
+      codigo:S.ativAp.codigo,descricao:S.ativAp.descricao,
+      setor:S.ativAp.setor_padrao||"",area:S.ativAp.area_padrao||"",
+      hora,idFechar:S.apIdInat||"",token:getToken(),
+    }).then(function(res) {
+      if (!res||res.__erro) { toast("Erro ao retomar","er"); return; }
+      S.apId   = res.id;
+      S.estado = "andamento";
+      if (S.atual) S.atual.hora_fim = hora;
+      const novo = {id_apontamento:res.id,atividade_codigo:S.ativAp.codigo,
+                    atividade_desc:S.ativAp.descricao,hora_inicio:hora,hora_fim:""};
+      S.aponts.push(novo);
+      S.atual = novo;
+      document.getElementById("ap-hora").textContent = hora;
+      document.getElementById("ap-hora").className   = "ap-hora run";
+      document.getElementById("ap-lbl").textContent  = "Em andamento desde";
+      document.getElementById("ap-crono").className  = "crono run";
+      setBtns([
+        {id:"btn-and",cls:"apb and",txt:"● Em andamento",dis:true},
+        {id:"btn-sus",cls:"apb sus",txt:"⏸ Suspenso",dis:false,fn:"clicarSuspenso()"},
+      ],"dois");
+      rBanner("andamento",novo);
+      iniciarCrono(hora);
+      toast("▶ Atividade retomada","ok");
+    })
+  }).catch(function(e) {
+      toast("Falha: "+(e.message||String(e)),"er");
+      setBtns([
+        {id:"btn-ret",cls:"apb ret",txt:"▶ Retomar",dis:false,fn:"retomar()"},
+        {id:"btn-sus2",cls:"apb sus",txt:"⏸ Suspenso",dis:true},
+      ],"dois");
+  });
+}
+
+// ═══════════════════════════════════
+// CRONÔMETRO (HH:MM:SS)
+// ═══════════════════════════════════
+function iniciarCrono(horaIni) {
+  pararCrono();
+  if (!horaIni) return;
+  const partes = horaIni.split(":").map(Number);
+  const h = partes[0]||0, m = partes[1]||0, s = partes[2]||0;
+  const base = new Date();
+  base.setHours(h,m,s,0);
+  S.crono = setInterval(() => {
+    const el = document.getElementById("ap-crono");
+    if (!el) { pararCrono(); return; }
+    const d = Math.max(0, Math.floor((Date.now()-base.getTime())/1000));
+    el.textContent = [Math.floor(d/3600),Math.floor((d%3600)/60),d%60]
+      .map(n=>String(n).padStart(2,"0")).join(":");
+  }, 1000);
+}
+function pararCrono() { if(S.crono){clearInterval(S.crono);S.crono=null;} }
+
+// ═══════════════════════════════════
+// OBSERVAÇÕES
+// ═══════════════════════════════════
+function rObs() {
+  const el = document.getElementById("obs-list");
+  if (!S.obsLoc.length) {
+    el.innerHTML=`<div style="text-align:center;font-size:12px;color:var(--tx3);padding:10px 0">Nenhuma ocorrência</div>`;
+    return;
+  }
+  el.innerHTML = S.obsLoc.map(o =>
+    `<div class="obs-row"><div class="obs-h">${o.hora}</div><div class="obs-t">${o.texto}</div></div>`
+  ).join("");
+}
+function envObs() {
+  const ta  = document.getElementById("obs-txt");
+  const txt = ta.value.trim();
+  if (!txt) return;
+  const hora = new Date().toTimeString().slice(0,5);
+  const idAp = S.apId || (S.atual&&S.atual.id_apontamento);
+  gsr("wsGravarObservacao",{id_apontamento:idAp,texto:txt,hora,token:getToken()})
+    .catch(()=>toast("Erro ao salvar obs","er"));
+  S.obsLoc.push({hora,texto:txt});
+  ta.value=""; ta.style.height="auto"; rObs();
+  document.getElementById("obs-list").scrollIntoView({behavior:"smooth",block:"end"});
+}
+
+// ═══════════════════════════════════
+// SEQUÊNCIA
+// ═══════════════════════════════════
+async function irSeq() {
+  go("seq");
+  const hoje = new Date();
+  document.getElementById("seq-dt").textContent =
+    hoje.toLocaleDateString("pt-BR",{weekday:"short",day:"2-digit",month:"short"});
+  document.getElementById("seq-list").innerHTML =
+    `<div class="empty"><div class="spin" style="margin:0 auto"></div></div>`;
+  document.getElementById("btn-dia").textContent = "...";
+  try {
+    const [aponts, statusDia] = await Promise.all([
+      gsr("wsGetMeusApontamentos",""),
+      gsr("wsGetStatusDia", getToken()),
+    ]);
+    S.seqIt    = aponts;
+    S.statusDia = statusDia;
+    rBtnDia();
+    rSeq();
+  } catch(e) {
+    document.getElementById("seq-list").innerHTML=`<div class="empty"><div class="et">Erro ao carregar</div></div>`;
+  }
+}
+
+function rBtnDia() {
+  const btn = document.getElementById("btn-dia");
+  if (!btn) return;
+  const fechado = S.statusDia && S.statusDia.status === "fechado";
+  if (fechado) {
+    btn.textContent = "🟡 Abrir dia";
+    btn.style.background = "rgba(251,191,36,.2)";
+    btn.style.color = "var(--yel)";
+    btn.style.border = "1px solid rgba(251,191,36,.4)";
+  } else {
+    // Só mostra botão fechar se tem apontamentos
+    if (S.seqIt && S.seqIt.length > 0) {
+      btn.textContent = "🔴 Fechar dia";
+      btn.style.background = "rgba(248,113,113,.15)";
+      btn.style.color = "var(--red)";
+      btn.style.border = "1px solid rgba(248,113,113,.3)";
+    } else {
+      btn.textContent = "";
+      btn.style.display = "none";
+      return;
+    }
+  }
+  btn.style.display = "flex";
+}
+
+async function toggleDia() {
+  const fechado = S.statusDia && S.statusDia.status === "fechado";
+  if (fechado) {
+    const ok = await confirmar("🟡","Reabrir o dia?",
+      "O dia será marcado como aberto. Você poderá fazer novos apontamentos.",
+      "Reabrir","by"
+    );
+    if (!ok) return;
+    try {
+      await gsr("wsAbrirDia", getToken());
+      S.statusDia = { status:"aberto" };
+      rBtnDia();
+      toast("Dia reaberto!","ok");
+    } catch(e) { toast("Erro: "+e.message,"er"); }
+  } else {
+    const ok = await confirmar("🔴","Fechar o dia?",
+      "O apontamento em andamento será encerrado e o dia será fechado.",
+      "Fechar dia","bdl"
+    );
+    if (!ok) return;
+    try {
+      const res = await gsr("wsFecharDia", getToken());
+      if (res.__erro) throw new Error(res.__erro);
+      S.statusDia = { status:"fechado", fechado_em: res.fechado_em };
+      S.atual = null;
+      rBtnDia();
+      await irSeq();
+      toast("✓ Dia fechado às "+res.fechado_em,"ok");
+    } catch(e) { toast("Erro: "+e.message,"er"); }
+  }
+}
+
+function rSeq() {
+  const el = document.getElementById("seq-list");
+  if (!S.seqIt.length) {
+    el.innerHTML=`<div class="empty"><div class="et">Nenhum registro hoje</div><div class="es">Inicie uma atividade na Home</div></div>`;
+    return;
+  }
+  el.innerHTML = S.seqIt.map((a,i) => {
+    const prx   = S.seqIt[i+1];
+    const conf  = a.hora_fim && prx && prx.hora_inicio && a.hora_fim > prx.hora_inicio;
+    const inat  = a.atividade_codigo === INAT;
+    const ab    = !a.hora_fim || a.hora_fim==="";
+    const isAt  = ab && S.atual && a.id_apontamento===S.atual.id_apontamento;
+    return `<div class="si ${conf?'conf':''} ${inat?'inat':''} ${isAt?'ativ':''}"
+        draggable="true"
+        ondragstart="dSt(event,${i})" ondragover="dOv(event,${i})"
+        ondrop="dDp(event,${i})" ondragend="dEd()">
+      <div class="dh">⠿</div>
+      <div class="si-info">
+        <div class="si-cod">${a.atividade_codigo}</div>
+        <div class="si-desc">${a.atividade_desc||a.atividade_codigo}</div>
+        <div class="si-h">${a.hora_inicio||'--:--:--'} → ${ab?'aberto':(a.hora_fim||'--:--:--')}${conf?' ⚠️':''}</div>
+      </div>
+      ${ab?`<span class="bdg ${isAt?'bg':'bb'}">${isAt?'● ATIVO':'ABERTO'}</span>`
+          :`<button class="icob" onclick="edSeq(${i})">✏️</button>`}
+    </div>`;
+  }).join("");
+}
+
+function dSt(e,i){S.dragIdx=i;e.currentTarget.classList.add("drag");}
+function dOv(e,i){e.preventDefault();document.querySelectorAll(".si").forEach(s=>s.classList.remove("over"));if(i!==S.dragIdx)e.currentTarget.classList.add("over");}
+function dDp(e,i){e.preventDefault();if(S.dragIdx===null||S.dragIdx===i)return;const a=[...S.seqIt];const[it]=a.splice(S.dragIdx,1);a.splice(i,0,it);S.seqIt=a;rSeq();chkC();}
+function dEd(){S.dragIdx=null;document.querySelectorAll(".si").forEach(s=>s.classList.remove("drag","over"));}
+function chkC(){let c=false;for(let i=0;i<S.seqIt.length-1;i++){const a=S.seqIt[i],b=S.seqIt[i+1];if(a.hora_fim&&b.hora_inicio&&a.hora_fim>b.hora_inicio){c=true;break;}}if(c)toast("⚠️ Conflito de horário","wa");}
+
+function edSeq(i) {
+  const it=S.seqIt[i]; S.seqEd={i,it};
+  document.getElementById("m-ed-info").textContent=it.atividade_desc||it.atividade_codigo;
+  document.getElementById("e-ini").value=it.hora_inicio||"";
+  document.getElementById("e-fim").value=it.hora_fim||"";
+  document.getElementById("e-cav").style.display="none";
+  ["e-ini","e-fim"].forEach(id=>document.getElementById(id).oninput=chkEdCav);
+  am("m-ed");
+}
+function chkEdCav(){
+  const{i}=S.seqEd;
+  const ini=document.getElementById("e-ini").value;
+  const fim=document.getElementById("e-fim").value;
+  const ant=S.seqIt[i-1],prx=S.seqIt[i+1];
+  const msgs=[];
+  if(ant&&ant.hora_fim&&ini&&ant.hora_fim>ini)msgs.push(`Conflito com anterior (fim:${ant.hora_fim})`);
+  if(prx&&prx.hora_inicio&&fim&&fim>prx.hora_inicio)msgs.push(`Conflito com próxima (início:${prx.hora_inicio})`);
+  if(fim&&ini&&fim<ini)msgs.push("Fim menor que início");
+  const el=document.getElementById("e-cav");
+  if(msgs.length){el.textContent="⚠️ "+msgs.join(" · ");el.style.display="block";}
+  else el.style.display="none";
+}
+async function savSeq(){
+  const{i,it}=S.seqEd;
+  const ini=document.getElementById("e-ini").value;
+  const fim=document.getElementById("e-fim").value;
+  if(!ini){toast("Informe a hora de início","er");return;}
+  try{
+    await gsr("wsAtualizarHorasApontamento",{id:it.id_apontamento,hora_inicio:ini,hora_fim:fim,token:getToken()});
+    S.seqIt[i]={...it,hora_inicio:ini,hora_fim:fim};
+    fm("m-ed");rSeq();toast("Salvo!","ok");
+  }catch(e){toast("Erro: "+e.message,"er");}
+}
+async function delSeq(){
+  const{i,it}=S.seqEd;
+  const okDel = await confirmar("🗑","Excluir apontamento?","Esta ação não pode ser desfeita.","Excluir","bdl");
+  if(!okDel)return;
+  try{
+    await gsr("wsExcluirApontamento",{id:it.id_apontamento,token:getToken()});
+    S.seqIt.splice(i,1);fm("m-ed");rSeq();toast("Excluído","ok");
+  }catch(e){toast("Erro: "+e.message,"er");}
+}
+function amSeq(){
+  const sel=document.getElementById("inc-at");
+  sel.innerHTML=S.ativs.map(a=>`<option value="${a.codigo}" data-desc="${esc(a.descricao)}">${a.codigo} — ${a.descricao}</option>`).join("");
+  document.getElementById("inc-ini").value="";document.getElementById("inc-fim").value="";
+  document.getElementById("inc-cav").style.display="none";
+  ["inc-ini","inc-fim"].forEach(id=>document.getElementById(id).oninput=chkIncCav);
+  am("m-inc");
+}
+function chkIncCav(){
+  const ini=document.getElementById("inc-ini").value;
+  const fim=document.getElementById("inc-fim").value;
+  const msgs=[];
+  S.seqIt.forEach(a=>{
+    if(!a.hora_inicio||!a.hora_fim)return;
+    const s=(ini&&ini>=a.hora_inicio&&ini<a.hora_fim)||(fim&&fim>a.hora_inicio&&fim<=a.hora_fim)||(ini&&fim&&ini<=a.hora_inicio&&fim>=a.hora_fim);
+    if(s)msgs.push(`${a.atividade_codigo}(${a.hora_inicio}–${a.hora_fim})`);
+  });
+  if(fim&&ini&&fim<ini)msgs.push("Fim menor que início");
+  const el=document.getElementById("inc-cav");
+  if(msgs.length){el.textContent="⚠️ Conflito com: "+msgs.join(", ");el.style.display="block";}
+  else el.style.display="none";
+}
+async function okIncluir(){
+  const sel=document.getElementById("inc-at");
+  const ini=document.getElementById("inc-ini").value;
+  const fim=document.getElementById("inc-fim").value;
+  if(!ini){toast("Informe a hora de início","er");return;}
+  try{
+    await gsr("wsIncluirApontamento",{token:getToken(),
+      codigo:sel.value,descricao:sel.options[sel.selectedIndex].dataset.desc,
+      hora_inicio:ini,hora_fim:fim,
+    });
+    fm("m-inc");await irSeq();toast("Incluído!","ok");
+  }catch(e){toast("Erro: "+e.message,"er");}
+}
+
+// ═══════════════════════════════════
+// PERFIL
+// ═══════════════════════════════════
+function rPerf(){
+  if(!S.user)return;
+  const u=S.user;
+  document.getElementById("pf-av").textContent=(u.nome||u.email||"?")[0].toUpperCase();
+  document.getElementById("pf-nm").textContent=u.nome||"—";
+  document.getElementById("pf-em").textContent=u.email||"—";
+  document.getElementById("pf-bdg").innerHTML=u.perfil==="admin"
+    ?`<span class="bdg bb">⚡ Administrador</span>`
+    :`<span class="bdg bgr">👤 Operador</span>`;
+}
+async function atuTudo(){
+  toast("Atualizando...","");
+  S.ativs=await gsr("wsGetAtividades", getToken());
+  S.filt=[...S.ativs];
+  await carregarHome();
+  toast("Atualizado!","ok");
+}
+
+// ═══════════════════════════════════
+// NAVEGAÇÃO
+// ═══════════════════════════════════
+function go(n){document.querySelectorAll(".pg").forEach(p=>p.classList.remove("on"));document.getElementById("pg-"+n).classList.add("on");}
+function irHome(){pararCrono();go("home");carregarHome();}
+function irPerf(){go("perf");rPerf();}
+
+// ═══════════════════════════════════
+// MODAL
+// ═══════════════════════════════════
+function am(id){document.getElementById(id).classList.add("on");}
+function fm(id){document.getElementById(id).classList.remove("on");}
+document.querySelectorAll(".mbg").forEach(el=>el.addEventListener("click",e=>{if(e.target===el)el.classList.remove("on");}));
+
+// ═══════════════════════════════════
+// UTILS
+// ═══════════════════════════════════
+function toast(msg,tipo){const el=document.getElementById("toast");el.textContent=msg;el.className="toast on"+(tipo?" "+tipo:"");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("on"),2800);}
+function lMsg(m){document.getElementById("load-msg").textContent=m;}
+function esc(s){return(s||"").replace(/'/g,"\\'").replace(/"/g,"&quot;");}
+
+init();
+
+// Event delegation para grupos (funciona dentro do iframe do Apps Script)
+document.getElementById("h-lista").addEventListener("click", function(e) {
+  // Clique no header do grupo → abre/fecha
+  const hdr = e.target.closest(".grp-hdr");
+  if (hdr) {
+    const gi   = parseInt(hdr.dataset.gi);
+    const nome = decodeURIComponent(hdr.dataset.nome);
+    toggleGrupo(gi, nome);
+    return;
+  }
+  // Clique no item do grupo → abre apontamento
+  const item = e.target.closest(".grp-item");
+  if (item) {
+    const cod  = decodeURIComponent(item.dataset.cod  || "");
+    const desc = decodeURIComponent(item.dataset.desc || "");
+    const set  = decodeURIComponent(item.dataset.set  || "");
+    const are  = decodeURIComponent(item.dataset.are  || "");
+    if (cod) abrirAp(cod, desc, set, are);
+  }
+});
+</script>
+</body>
+</html>
