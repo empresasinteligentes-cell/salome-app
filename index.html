@@ -527,7 +527,9 @@ function gsr(fn, arg) {
 // INIT
 // ═══════════════════════════════════
 async function init() {
-  go("login");
+  // Remove loading e vai direto para login
+  document.getElementById("pg-load").classList.remove("on");
+  document.getElementById("pg-login").classList.add("on");
 }
 
 async function continueInit() {
@@ -1276,7 +1278,11 @@ async function atuTudo(){
 // ═══════════════════════════════════
 // NAVEGAÇÃO
 // ═══════════════════════════════════
-function go(n){document.querySelectorAll(".pg").forEach(p=>p.classList.remove("on"));document.getElementById("pg-"+n).classList.add("on");}
+function go(n){
+  document.querySelectorAll(".pg").forEach(p=>p.classList.remove("on"));
+  const el = document.getElementById("pg-"+n);
+  if(el) el.classList.add("on");
+}
 function irHome(){pararCrono();go("home");carregarHome();}
 function irPerf(){go("perf");rPerf();}
 
