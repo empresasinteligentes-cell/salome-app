@@ -174,7 +174,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:100dvh
 <body>
 
 <!-- LOGIN -->
-<div id="pg-login" class="pg" style="background:var(--bg)">
+<div id="pg-login" class="pg on" style="background:var(--bg)">
   <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;padding:28px 24px;max-width:360px;margin:0 auto">
 
     <!-- Logo -->
@@ -221,7 +221,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:100dvh
 </div>
 
 <!-- LOADING -->
-<div id="pg-load" class="pg on">
+<div id="pg-load" class="pg">
   <div class="load"><div class="spin"></div>
     <div style="color:var(--tx2);font-size:13px" id="load-msg">Carregando SALOME...</div>
   </div>
@@ -527,14 +527,13 @@ function gsr(fn, arg) {
 // INIT
 // ═══════════════════════════════════
 async function init() {
-  // Remove loading e vai direto para login
-  document.getElementById("pg-load").classList.remove("on");
-  document.getElementById("pg-login").classList.add("on");
+  // pg-login já começa visível no HTML — nada a fazer
 }
 
 async function continueInit() {
   lMsg("Autenticando...");
-  go("load");
+  document.querySelectorAll(".pg").forEach(p=>p.classList.remove("on"));
+  document.getElementById("pg-load").classList.add("on");
   try {
     S.user  = await gsr("wsGetPerfil", getToken());
     lMsg("Carregando atividades...");
