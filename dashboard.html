@@ -162,6 +162,20 @@ const INAT="INATIVO-001";
 const CORES_GRUPOS={"Embarcador":"#38bdf8","Transporte":"#818cf8","Descarga e recebimento":"#34d399","Armazém":"#fbbf24","Palete":"#f472b6","Carga e embarque":"#fb923c","Administrativo":"#94a3b8","Suporte":"#a78bfa","Sistema":"#475569"};
 function corAtiv(cod,grupo){return cod===INAT?"#475569":CORES_GRUPOS[grupo]||"#38bdf8";}
 let DADOS_RAW=[],DADOS_FILT=[],CHARTS={},SORT_COL="data_inicio",SORT_DIR=1;
+let DASH_TOKEN="";
+
+function getToken(){
+  // Tenta pegar token do sessionStorage (passado pelo app)
+  try{
+    const t=sessionStorage.getItem("salome_token")||localStorage.getItem("salome_token")||"";
+    if(t){DASH_TOKEN=t;return t;}
+  }catch(_){}
+  // Tenta pegar da URL: ?token=xxx
+  const params=new URLSearchParams(window.location.search);
+  const t=params.get("token")||"";
+  if(t){DASH_TOKEN=t;return t;}
+  return DASH_TOKEN||"";
+}
 
 const APPS_SCRIPT_URL="https://script.google.com/macros/s/AKfycbw1DcHIKPHt5WPwMQP1-UuPea-trKwiYNf8xwIm50-7WyiXSJmVRyTxUStbHIJoLpUlfw/exec";
 
@@ -196,7 +210,8 @@ async function init(){
 async function carregarDados(){
   try{
     const de=document.getElementById("f-de").value,ate=document.getElementById("f-ate").value;
-    const res=await api("wsGetTodosApontamentos",{de,ate});
+    const token=getToken();
+    const res=await api("wsGetTodosApontamentos",{de,ate,token});
     if(res&&res.__erro){toast(res.__erro+" — dados de demonstração","er");DADOS_RAW=gerarDemo();}
     else DADOS_RAW=Array.isArray(res)?res:(res&&res.data?res.data:gerarDemo());
   }catch(e){console.log("Demo:",e.message);DADOS_RAW=gerarDemo();}
