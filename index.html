@@ -1002,7 +1002,7 @@ function envObs() {
 // ═══════════════════════════════════════════════
 // SEQUÊNCIA
 // ═══════════════════════════════════════════════
-async function irSeq() {
+async function irNavSeq() {
   go("seq"); S.telaAtual="seq";
   const hoje=new Date();
   document.getElementById("seq-dt").textContent=hoje.toLocaleDateString("pt-BR",{weekday:"short",day:"2-digit",month:"short"});
@@ -1051,7 +1051,7 @@ async function toggleDia() {
       const res=await gsr("wsFecharDia",getToken());
       if(res.__erro)throw new Error(res.__erro);
       S.statusDia={status:"fechado",fechado_em:res.fechado_em};S.atual=null;
-      rBtnDiaSeq();await irSeq();toast("✓ Dia fechado às "+res.fechado_em,"ok");
+      rBtnDiaSeq();await irNavSeq();toast("✓ Dia fechado às "+res.fechado_em,"ok");
     }catch(e){toast("Erro: "+e.message,"er");}
   }
 }
@@ -1139,7 +1139,7 @@ async function okIncluir(){
   if(!ini){toast("Informe a hora de início","er");return;}
   try{
     await gsr("wsIncluirApontamento",{token:getToken(),codigo:sel.value,descricao:sel.options[sel.selectedIndex].dataset.desc,hora_inicio:ini,hora_fim:fim});
-    fm("m-inc");await irSeq();toast("Incluído!","ok");
+    fm("m-inc");await irNavSeq();toast("Incluído!","ok");
   }catch(e){toast("Erro: "+e.message,"er");}
 }
 
@@ -1163,12 +1163,17 @@ async function atuTudo(){
 }
 function abrirDashboard(){
   try{
+    // Salva token para o dashboard usar
+    const tk=getToken();
+    try{sessionStorage.setItem("salome_token",tk);localStorage.setItem("salome_token",tk);}catch(_){}
+
     let url;
     if(typeof google!=="undefined"&&google.script&&google.script.getScriptUrl){
       url=google.script.getScriptUrl()+"?pg=dashboard";
     } else {
-      // GitHub Pages: abre dashboard.html na mesma pasta
-      url=window.location.href.split("?")[0].replace("index.html","")+"dashboard.html";
+      // GitHub Pages: passa token na URL como fallback
+      const base=window.location.href.split("?")[0].replace("index.html","");
+      url=base+"dashboard.html?token="+encodeURIComponent(tk);
     }
     window.open(url,"_blank");
   }catch(e){toast("Não disponível neste ambiente","wa");}
@@ -1195,7 +1200,7 @@ function go(n){
 // para que, se a sessão ainda existir, possamos restaurar.
 
 function irHome(){pararCrono();go("home");S.telaAtual="home";carregarHome();}
-function irSeq(){S.telaAtual="seq";irSeq();}
+function irSeq(){S.telaAtual="seq";irNavSeq();}
 function irPerf(){go("perf");S.telaAtual="perf";rPerf();}
 
 // PONTO 4: intercepta navegação antes de sair da página
