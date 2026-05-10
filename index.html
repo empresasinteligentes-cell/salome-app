@@ -462,6 +462,34 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:100dvh
 
 <script>
 // ═══════════════════════════════════════════════
+// BRIDGE — detecta ambiente e usa fetch (GitHub) ou google.script.run (Apps Script)
+// ═══════════════════════════════════════════════
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw1DcHIKPHt5WPwMQP1-UuPea-trKwiYNf8xwIm50-7WyiXSJmVRyTxUStbHIJoLpUlfw/exec";
+
+function gsr(fn, arg) {
+  // Dentro do Apps Script usa google.script.run
+  if (typeof google !== "undefined" && google.script && google.script.run) {
+    return new Promise((ok, err) => {
+      const run = google.script.run
+        .withSuccessHandler(r => { if(r&&r.__erro) err(new Error(r.__erro)); else ok(r); })
+        .withFailureHandler(e => err(new Error(e.message||String(e))));
+      arg !== undefined ? run[fn](arg) : run[fn]();
+    });
+  }
+  // Fora do Apps Script (GitHub Pages) usa fetch
+  return fetch(APPS_SCRIPT_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain" },
+    body: JSON.stringify({ fn, arg: arg !== undefined ? arg : null }),
+  })
+  .then(r => r.json())
+  .then(r => {
+    if (r && r.__erro) throw new Error(r.__erro);
+    return r;
+  });
+}
+
+// ═══════════════════════════════════════════════
 // ESTADO GLOBAL
 // ═══════════════════════════════════════════════
 const INAT = "INATIVO-001";
@@ -499,17 +527,7 @@ function getToken() { return S.token || ""; }
 function setToken(t,n) { S.token = t; S.nomeLocal = n; }
 function clearToken() { S.token = ""; S.nomeLocal = ""; }
 
-// ═══════════════════════════════════════════════
-// BRIDGE — google.script.run
-// ═══════════════════════════════════════════════
-function gsr(fn, arg) {
-  return new Promise((ok, err) => {
-    const run = google.script.run
-      .withSuccessHandler(r => { if(r&&r.__erro) err(new Error(r.__erro)); else ok(r); })
-      .withFailureHandler(e => err(new Error(e.message||String(e))));
-    arg !== undefined ? run[fn](arg) : run[fn]();
-  });
-}
+
 
 // ═══════════════════════════════════════════════
 // MODAL CONFIRMAÇÃO
@@ -1145,7 +1163,13 @@ async function atuTudo(){
 }
 function abrirDashboard(){
   try{
-    const url=google.script.getScriptUrl?google.script.getScriptUrl()+"?pg=dashboard":window.location.href.split("?")[0]+"?pg=dashboard";
+    let url;
+    if(typeof google!=="undefined"&&google.script&&google.script.getScriptUrl){
+      url=google.script.getScriptUrl()+"?pg=dashboard";
+    } else {
+      // GitHub Pages: abre dashboard.html na mesma pasta
+      url=window.location.href.split("?")[0].replace("index.html","")+"dashboard.html";
+    }
     window.open(url,"_blank");
   }catch(e){toast("Não disponível neste ambiente","wa");}
 }
