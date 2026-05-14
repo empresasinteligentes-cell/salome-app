@@ -1174,7 +1174,7 @@ function abrirDashboard(){
 
     let url;
     if(typeof google!=="undefined"&&google.script&&google.script.getScriptUrl){
-      url=google.script.getScriptUrl()+"?pg=dashboard";
+      url=google.script.getScriptUrl()+"?pg=dashboard&token="+encodeURIComponent(tk);
     } else {
       // GitHub Pages: passa token na URL como fallback
       const base=window.location.href.split("?")[0].replace("index.html","");
