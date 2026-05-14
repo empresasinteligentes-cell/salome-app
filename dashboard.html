@@ -165,16 +165,20 @@ let DADOS_RAW=[],DADOS_FILT=[],CHARTS={},SORT_COL="data_inicio",SORT_DIR=1;
 let DASH_TOKEN="";
 
 function getToken(){
-  // Tenta pegar token do sessionStorage (passado pelo app)
+  // 1. DASH_TOKEN já injetado pelo doGet (Apps Script)
+  if(DASH_TOKEN) return DASH_TOKEN;
+  // 2. sessionStorage / localStorage (GitHub Pages via abrirDashboard)
   try{
     const t=sessionStorage.getItem("salome_token")||localStorage.getItem("salome_token")||"";
     if(t){DASH_TOKEN=t;return t;}
   }catch(_){}
-  // Tenta pegar da URL: ?token=xxx
-  const params=new URLSearchParams(window.location.search);
-  const t=params.get("token")||"";
-  if(t){DASH_TOKEN=t;return t;}
-  return DASH_TOKEN||"";
+  // 3. Parâmetro na URL: ?token=xxx
+  try{
+    const params=new URLSearchParams(window.location.search);
+    const t=params.get("token")||"";
+    if(t){DASH_TOKEN=t;return t;}
+  }catch(_){}
+  return "";
 }
 
 const APPS_SCRIPT_URL="https://script.google.com/macros/s/AKfycbw1DcHIKPHt5WPwMQP1-UuPea-trKwiYNf8xwIm50-7WyiXSJmVRyTxUStbHIJoLpUlfw/exec";
