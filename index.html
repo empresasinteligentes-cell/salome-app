@@ -988,6 +988,7 @@ async function clicarIniciar() {
     const ant=S.atual.atividade_desc||S.atual.atividade_codigo;
     const ok=await confirmar("🔄","Trocar atividade?",'Encerrar "'+ant+'" e iniciar "'+S.ativAp.descricao+'"?',"Encerrar e iniciar","bok");
     if(!ok)return;
+    await pedirDadosEncerramento("Encerrando: "+(S.atual?S.atual.atividade_desc||S.atual.atividade_codigo:""), S.atual?S.atual.id_apontamento:null);
   }
   const horaAgora=new Date().toTimeString().slice(0,5);
   document.getElementById("ap-hora").textContent=horaAgora;
@@ -1196,6 +1197,8 @@ async function toggleDia() {
   } else {
     const ok=await confirmar("🔴","Fechar dia / Pausa almoço?","O apontamento em andamento será encerrado.","Fechar dia / Pausa almoço","bdl");
     if(!ok)return;
+    const idAtualSeq=S.atual?S.atual.id_apontamento:null;
+    await pedirDadosEncerramento("Fechamento do dia", idAtualSeq);
     try{
       const res=await gsr("wsFecharDia",getToken());
       if(res.__erro)throw new Error(res.__erro);
